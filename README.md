@@ -11,25 +11,49 @@ at_core.c at_core.h用于OS版本
 
 ##### at_chat 模块(无OS)
 
-1.  定义AT管理器
-    at_core_t at;  
-	
-2.  AT管理器配置参数
-const at_core_conf_t conf = { 
+
+```
+
+static at_core_t at;          //定义AT管理器
+
+const at_core_conf_t conf = { //AT管理器配置参数
 	
 };
+```
+
 
 3.  初始化AT管理器
+
+```
 at_core_init(&at, &conf);
+```
+
 
 4.  将AT管理器放入任务中轮询
-at_poll_task(&at);
+
+```
+void main(void)
+{
+    /*do something ...*/
+    while (1) {
+        /*do something ...*/
+        
+        at_poll_task(&at);
+    }
+}
+
+```
+
 
 5.  发送单行命令
 
+
+```
 static void read_csq_callback(at_response_t *r)
 {
 	/*...*/
 }
 at_send_singlline(&at, read_csq_callback, "AT+CSQ");
+```
+
 
