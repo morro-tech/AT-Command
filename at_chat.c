@@ -1,17 +1,19 @@
-/******************************************************************************
- * @brief    AT 通信管理(无OS版本)
- *
- * Copyright (c) 2019, <master_roger@sina.com>
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs: 
- * Date           Author       Notes 
-* 2016-01-22     Morro        Initial version. 
-* 2018-02-11     Morro        使用链式队列管理AT作业
-* 2020-05-21     Morro        支持at_core对象
- ******************************************************************************/
-
+/*******************************************************************************
+* @file		at_core.h
+* @brief	AT command communications.
+* 			
+* @version	5.0
+* @date		2020-05-11
+* @author	roger.luo
+*
+* Change Logs: 
+* Date           Author       Notes 
+* 2016-01-22     roger.luo   Initial version. 
+* 2017-05-21     roger.luo   1.1 加入任务状态管理   
+* 2018-02-11     roger.luo   3.0 
+* 2020-01-02     roger.luo   4.0 os version
+* 2020-05-21     roger.luo   5.0 无OS版本
+*******************************************************************************/
 #include "at_chat.h"
 #include <stdarg.h>
 #include <string.h>
@@ -52,10 +54,10 @@ static void send_data(at_core_t *ac, const void *buf, unsigned int len)
  */
 static void print(at_core_t *ac, const char *cmd, ...)
 {
-    va_list args;   
+    va_list args;	
     va_start(args, cmd);
     at_send_line(ac, cmd, args);
-    va_end(args);   
+    va_end(args);	
 }
 /*
  * @brief   获取当前数据接收长度
@@ -90,7 +92,7 @@ static char *search_string(at_core_t *ac, const char *str)
 /*前向查找字串*/
 static bool at_isabort(at_core_t *ac)
 {
-    return ac->cursor ? ac->cursor->abort : 1;
+	return ac->cursor ? ac->cursor->abort : 1;
 }
 
 
@@ -164,7 +166,7 @@ static int do_cmd_handler(at_core_t *a)
 {
     at_item_t *i = a->cursor;
     at_env_t  *e = &a->env;
-    const at_cmd_t *c = (at_cmd_t *)i->info;
+    const at_respond_t *c = (at_respond_t *)i->info;
     switch(e->state) {
     case 0:  /*发送状态 ------------------------------------------------------*/                              
         c->sender(e);
@@ -173,7 +175,7 @@ static int do_cmd_handler(at_core_t *a)
         e->recvclr(a);
     break;
     case 1: /*接收状态 ------------------------------------------------------*/ 
-        if (search_string(a, c->matcher)) {                         
+        if (search_string(a, c->matcher)) {                      	
             do_at_callback(a, i, c->cb, AT_RET_OK);
             return true;
         } else if (search_string(a, "ERROR")) {    
@@ -221,7 +223,7 @@ static int send_signlline_handler(at_core_t *a)
         e->recvclr(a);
     break;
     case 1: /*接收状态 ------------------------------------------------------*/ 
-        if (search_string(a, "OK")) {                       
+        if (search_string(a, "OK")) {                      	
             do_at_callback(a, i, cb, AT_RET_OK);
             return true;
         } else if (search_string(a, "ERROR")) {
@@ -332,10 +334,10 @@ static void urc_handler_entry(at_core_t *ac, char *urc, unsigned int size)
  */
 static void urc_recv_process(at_core_t *ac, char *buf, unsigned int size)
 {
-    char *urc_buf;  
+    char *urc_buf;	
     unsigned short urc_size;
     urc_buf  = (char *)ac->cfg.urc_buf;
-    urc_size = ac->cfg.urc_bufsize; 
+    urc_size = ac->cfg.urc_bufsize;	
     if (size == 0 && ac->urc_cnt > 0) {
         if (AT_IS_TIMEOUT(ac->urc_timer, 2000)){
             urc_handler_entry(ac, urc_buf, ac->urc_cnt);
@@ -364,7 +366,7 @@ static void urc_recv_process(at_core_t *ac, char *buf, unsigned int size)
 static void resp_recv_process(at_core_t *ac, const char *buf, unsigned int size)
 {
     char *rcv_buf;
-    unsigned short rcv_size;    
+    unsigned short rcv_size;	
     
     rcv_buf  = (char *)ac->cfg.rcv_buf;
     rcv_size = ac->cfg.rcv_bufsize;
@@ -372,7 +374,7 @@ static void resp_recv_process(at_core_t *ac, const char *buf, unsigned int size)
     if (ac->rcv_cnt + size >= rcv_size)         //接收溢出
         ac->rcv_cnt = 0;
     
-    memcpy(rcv_buf, buf, size);
+    memcpy(rcv_buf + rcv_cnt, buf, size);
     ac->rcv_cnt += size;
     rcv_buf[ac->rcv_cnt] = '\0';
 
@@ -394,7 +396,7 @@ bool at_do_work(at_core_t *ac, int (*work)(at_env_t *e), void *params)
  * @param[in]   a - AT管理器
  * @param[in]   cmd   - cmd命令
  */
-bool at_do_cmd(at_core_t *ac, void *params, const at_cmd_t *cmd)
+bool at_do_cmd(at_core_t *ac, void *params, const at_respond_t *cmd)
 {
     return add_work(ac, params, (void *)cmd, AT_TYPE_CMD);
 }
@@ -429,7 +431,7 @@ bool at_send_multiline(at_core_t *ac, at_callback_t cb, const char **multiline)
 
 void at_item_abort(at_item_t *i)
 {
-    i->abort = 1;
+	i->abort = 1;
 }
 
 /*
@@ -450,7 +452,7 @@ static void at_work_manager(at_core_t *ac)
     at_env_t           *e      = &ac->env;
     /*通用工作处理者 ---------------------------------------------------------*/
     static int (*const work_handler_table[])(at_core_t *) = {
-        do_work_handler, 
+    	do_work_handler, 
         do_cmd_handler,
         send_signlline_handler,
         send_multiline_handler
@@ -468,10 +470,10 @@ static void at_work_manager(at_core_t *ac)
     }
     /*工作执行完成,则将它放入到空闲工作链 ------------------------------------*/
     if (work_handler_table[cursor->type](ac) || cursor->abort) {
-        ac->cfg.lock();
-        list_move_tail(&ac->cursor->node, &ac->ls_idle);
-        ac->cursor = NULL;
-        ac->cfg.unlock();
+    	ac->cfg.lock();
+    	list_move_tail(&ac->cursor->node, &ac->ls_idle);
+		ac->cursor = NULL;
+		ac->cfg.unlock();
     }
         
 }

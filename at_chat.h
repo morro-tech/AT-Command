@@ -1,16 +1,20 @@
-/******************************************************************************
- * @brief    AT 通信管理(无OS版本)
- *
- * Copyright (c) 2019, <master_roger@sina.com>
- *
- * SPDX-License-Identifier: Apache-2.0
- *
- * Change Logs: 
- * Date           Author       Notes 
-* 2016-01-22     Morro        Initial version. 
-* 2018-02-11     Morro        使用链式队列管理AT作业
-* 2020-05-21     Morro        支持at_core对象
- ******************************************************************************/
+/*******************************************************************************
+* Copyright(C)20 roger.luo
+* All rights reserved.
+* @file		atchat.h
+* @brief	AT command communications.
+* 			
+* @version	3.0
+* @date		2018-02-11
+* @author	roger.luo
+*
+* Change Logs: 
+* Date           Author       Notes 
+* 2016-01-22     roger.luo   Initial version. 
+* 2017-05-21     roger.luo   1.1 加入任务状态管理   
+* 2018-02-11     roger.luo   3.0 
+* 2020-01-02     roger.luo   4.0 os version
+*******************************************************************************/
 #ifndef _ATCHAT_H_
 #define _ATCHAT_H_
 
@@ -37,22 +41,22 @@ typedef struct {
     void         (*before_at)(void);                            /*开始执行AT*/
     void         (*after_at)(void);
     void         (*error)(void);
-    utc_item_t    *utc_tbl;                                     /*utc 表*/
-    unsigned char *urc_buf;                                     /*urc接收缓冲区*/
+	utc_item_t    *utc_tbl;                                     /*utc 表*/
+	unsigned char *urc_buf;                                     /*urc接收缓冲区*/
     unsigned char *rcv_buf;
-    unsigned short urc_tbl_count;
-    unsigned short urc_bufsize;                                 /*urc缓冲区大小*/
+	unsigned short urc_tbl_count;
+	unsigned short urc_bufsize;                                 /*urc缓冲区大小*/
     unsigned short rcv_bufsize;                                 /*接收缓冲区*/
 }at_core_conf_t;
 
 /*AT作业运行环境*/
 typedef struct {
-    int         i,j,state;   
-    void        *params;
+	int         i,j,state;   
+	void        *params;
     void        (*reset_timer)(struct at_core *ac);
-    bool        (*is_timeout)(struct at_core *ac, unsigned int ms); /*时间跨度判断*/    
-    void        (*printf)(struct at_core *ac, const char *fmt, ...);
-    char *      (*find)(struct at_core *ac, const char *expect);
+	bool        (*is_timeout)(struct at_core *ac, unsigned int ms); /*时间跨度判断*/
+	void        (*printf)(struct at_core *ac, const char *fmt, ...);
+	char *      (*find)(struct at_core *ac, const char *expect);
     char *      (*recvbuf)(struct at_core *ac);                 /*指向接收缓冲区*/
     unsigned int(*recvlen)(struct at_core *ac);                 /*缓冲区总长度*/
     void        (*recvclr)(struct at_core *ac);                 /*清空接收缓冲区*/
@@ -64,14 +68,14 @@ typedef enum {
     AT_RET_OK = 0,                                             /*执行成功*/
     AT_RET_ERROR,                                              /*执行错误*/
     AT_RET_TIMEOUT,                                            /*响应超时*/
-    AT_RET_ABORT,                                              /*强行中止*/
+	AT_RET_ABORT,                                              /*强行中止*/
 }at_return;
 
 /*AT响应 */
 typedef struct {
     void           *param;
-    char           *recvbuf;
-    unsigned short  recvcnt;
+	char           *recvbuf;
+	unsigned short  recvcnt;
     at_return       ret;
 }at_response_t;
 
@@ -90,23 +94,23 @@ typedef struct {
     unsigned char type  : 3;
     unsigned char abort : 1;
     void          *param;
-    void          *info;
+	void          *info;
     struct list_head node;
 }at_item_t;
 
 /*AT管理器 ------------------------------------------------------------------*/
 typedef struct at_core{
-    at_core_conf_t          cfg;
+	at_core_conf_t          cfg;
     at_env_t                env;
-    at_item_t               tbl[10];
+	at_item_t               tbl[10];
     at_item_t               *cursor;
     struct list_head        ls_ready, ls_idle;               /*就绪,空闲作业链*/
-    unsigned int            resp_timer;
-    unsigned int            urc_timer;
-    at_return               ret;
-    //urc接收计数, 命令响应接收计数器
-    unsigned short          urc_cnt, rcv_cnt;
-    unsigned char           suspend: 1;
+	unsigned int            resp_timer;
+	unsigned int            urc_timer;
+	at_return               ret;
+	//urc接收计数, 命令响应接收计数器
+	unsigned short          urc_cnt, rcv_cnt;
+	unsigned char           suspend: 1;
 }at_core_t;
 
 typedef struct {
