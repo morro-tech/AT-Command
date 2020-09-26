@@ -1,18 +1,15 @@
-/*******************************************************************************
-* @file		at.h
-* @brief	AT命令通信管理
-* 			
-* @version	5.0
-* @date		2020-05-11
-* @author	roger.luo
-*
-* Change Logs: 
-* Date           Author       Notes 
-* 2016-01-22     roger.luo   Initial version. 
-* 2017-05-21     roger.luo   1.1 加入任务状态管理   
-* 2018-02-11     roger.luo   3.0 
-* 2020-01-02     roger.luo   4.0 分离os版本
-*******************************************************************************/
+/******************************************************************************
+ * @brief        AT命令通信管理(OS版本)
+ *
+ * Copyright (c) 2020, <master_roger@sina.com>
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * Change Logs: 
+ * Date           Author       Notes 
+ * 2020-01-02     Morro        Initial version. 
+ ******************************************************************************/
+ 
 #ifndef _AT_H_
 #define _AT_H_
 

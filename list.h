@@ -1,13 +1,8 @@
-#ifndef _LINUX_LIST_H
-#define _LINUX_LIST_H
+
+#ifndef _LINUX_LIST_H_
+#define _LINUX_LIST_H_
 	
 #include <stddef.h>		
-
-#define typeof	(struct list_head)
-
-
-#undef offsetof
-#define offsetof(TYPE, MEMBER) ((size_t) &((TYPE *)0)->MEMBER)
 
 /**
  * container_of - cast a member of a structure out to the containing structure
@@ -16,16 +11,9 @@
  * @member:	the name of the member within the struct.
  *
  */
-#ifdef __ICCARM__ /* IAR, and the 'ptr' must be 'struct list_head *' type, 'member' must be 'struct list_head' type  */
 #define container_of(ptr, type, member) ( \
 	(type *)( (char *)(ptr) - offsetof(type,member) ))
-#else
-#define container_of(ptr, type, member) ({			\
-	const typeof( ((type *)0)->member ) *__mptr = (ptr);	\
-	(type *)( (char *)__mptr - offsetof(type,member) );})
-#endif
 
-/* copy from <linux/poison.h>,  */
 /*
  * used to verify that nobody uses non-initialized list entries.
  */
