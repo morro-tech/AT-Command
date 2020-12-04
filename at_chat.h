@@ -1,7 +1,7 @@
 /******************************************************************************
  * @brief        AT÷∏¡ÓÕ®–≈
  *
- * Copyright (c) 2020, <master_roger@sina.com>
+ * Copyright (c) 2020, <morro_luo@163.com>
  *
  * SPDX-License-Identifier: Apathe-2.0
  *

@@ -1,7 +1,7 @@
 /******************************************************************************
  * @brief        AT命令通信管理(OS版本)
  *
- * Copyright (c) 2020, <master_roger@sina.com>
+ * Copyright (c) 2020, <morro_luo@163.com>
  *
  * SPDX-License-Identifier: Apache-2.0
  *
